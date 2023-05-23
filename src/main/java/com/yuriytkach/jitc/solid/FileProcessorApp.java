@@ -1,5 +1,9 @@
 package com.yuriytkach.jitc.solid;
 
+import com.yuriytkach.jitc.solid.reader.PdfReader;
+import com.yuriytkach.jitc.solid.reader.TxtReader;
+import com.yuriytkach.jitc.solid.reader.WordReader;
+
 import java.nio.file.Path;
 
 public class FileProcessorApp {
@@ -16,11 +20,13 @@ public class FileProcessorApp {
   }
 
   private void count(final String folder, final String word) {
-    final FileFinder fileFinder = new FileFinder(Path.of(folder));
+    FileReader fileReader = configureReader();
+    final FileFinder fileFinder = new FileFinder(Path.of(folder), fileReader);
 
     final FileProcessor fileProcessor = new FileProcessor(
       fileFinder,
       new FileDownloader(),
+      fileReader,
       new TextFileAnalyzer()
     );
 
@@ -28,4 +34,11 @@ public class FileProcessorApp {
     System.out.printf("Occurrences of word '%s': %d%n", word, count);
   }
 
+  private FileReader configureReader() {
+    FileReader fileReader = new FileReader();
+    fileReader.register(new TxtReader());
+    fileReader.register(new PdfReader());
+    fileReader.register(new WordReader());
+    return fileReader;
+  }
 }
